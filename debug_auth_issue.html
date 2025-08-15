@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Authentication Issue</title>
+</head>
+<body>
+    <h1>Debug Authentication Issue</h1>
+    
+    <div>
+        <h2>Step 1: Login</h2>
+        <button onclick="testLogin()">Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>Step 2: Check Token Storage</h2>
+        <button onclick="checkToken()">Check Token</button>
+        <div id="tokenResult"></div>
+    </div>
+    
+    <div>
+        <h2>Step 3: Test API Call</h2>
+        <button onclick="testApiCall()">Test User Info</button>
+        <div id="apiResult"></div>
+    </div>
+    
+    <div>
+        <h2>Step 4: Test Experiment Creation</h2>
+        <button onclick="testExperimentCreation()">Create Experiment</button>
+        <div id="experimentResult"></div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Logging in...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', 'demo_user');
+                formData.append('password', 'secret');
+                
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.access_token;
+                    // Simulate what the API client does
+                    localStorage.setItem('automl_token', currentToken);
+                    
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Login Successful!</strong><br>
+                            Token: ${currentToken.substring(0, 50)}...<br>
+                            Token stored in localStorage
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Login Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function checkToken() {
+            const resultDiv = document.getElementById('tokenResult');
+            
+            const storedToken = localStorage.getItem('automl_token');
+            const hasToken = !!storedToken;
+            
+            resultDiv.innerHTML = `
+                <div>
+                    <strong>Token Check:</strong><br>
+                    Has token: ${hasToken}<br>
+                    Current token: ${currentToken ? currentToken.substring(0, 50) + '...' : 'null'}<br>
+                    Stored token: ${storedToken ? storedToken.substring(0, 50) + '...' : 'null'}<br>
+                    Tokens match: ${currentToken === storedToken}
+                </div>
+            `;
+        }
+        
+        async function testApiCall() {
+            const resultDiv = document.getElementById('apiResult');
+            
+            const token = localStorage.getItem('automl_token') || currentToken;
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div style="color: orange;">No token available. Please login first.</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Testing API call...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>API Call Successful!</strong><br>
+                            User: ${data.username}<br>
+                            ID: ${data.id}<br>
+                            Active: ${data.is_active}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>API Call Failed:</strong><br>
+                            Status: ${response.status}<br>
+                            Error: ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testExperimentCreation() {
+            const resultDiv = document.getElementById('experimentResult');
+            
+            const token = localStorage.getItem('automl_token') || currentToken;
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div style="color: orange;">No token available. Please login first.</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Creating experiment...';
+            
+            try {
+                const experimentData = {
+                    name: 'Debug Test Experiment',
+                    dataset_path: 'data/uploads/simple_test.csv',
+                    task_type: 'classification',
+                    data_type: 'tabular',
+                    config: {
+                        description: 'Debug test'
+                    }
+                };
+                
+                const response = await fetch('http://localhost:8000/api/v1/experiments', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(experimentData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Experiment Created Successfully!</strong><br>
+                            ID: ${data.id}<br>
+                            Name: ${data.name}<br>
+                            Status: ${data.status}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Experiment Creation Failed:</strong><br>
+                            Status: ${response.status}<br>
+                            Error: ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+groups:
+  - name: automl_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: system_cpu_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 90% for more than 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: system_memory_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 90% for more than 5 minutes"
+
+      - alert: HighDiskUsage
+        expr: system_disk_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk usage detected"
+          description: "Disk usage is above 95% for more than 2 minutes"
+
+      - alert: APIHighErrorRate
+        expr: rate(api_requests_total{status_code=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is above 10% for more than 2 minutes"
+
+      - alert: APISlowResponse
+        expr: histogram_quantile(0.95, rate(api_request_duration_ms_bucket[5m])) > 5000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow API responses"
+          description: "95th percentile response time is above 5 seconds"
+
+      - alert: DatabaseConnectionFailure
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection failure"
+          description: "Cannot connect to PostgreSQL database"
+
+      - alert: MongoDBConnectionFailure
+        expr: up{job="mongodb-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB connection failure"
+          description: "Cannot connect to MongoDB database"
+
+      - alert: RedisConnectionFailure
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis connection failure"
+          description: "Cannot connect to Redis cache"
+
+      - alert: GPUOverheating
+        expr: max(system_gpu_temperature) > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GPU overheating"
+          description: "GPU temperature is above 85°C"
+
+      - alert: HighTrainingFailureRate
+        expr: rate(training_failed_jobs[10m]) / rate(training_total_jobs[10m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High training job failure rate"
+          description: "Training job failure rate is above 50%"

@@ -1,0 +1,305 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: training-worker
+  namespace: automl
+  labels:
+    app: training-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: training-worker
+  template:
+    metadata:
+      labels:
+        app: training-worker
+    spec:
+      nodeSelector:
+        accelerator: nvidia-tesla-v100
+      containers:
+      - name: training-worker
+        image: automl/worker:latest
+        command: ["python", "-m", "automl_framework.services.training_service"]
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://automl:$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)"
+        - name: MONGODB_URL
+          value: "mongodb://automl:$(MONGODB_PASSWORD)@$(MONGODB_HOST):$(MONGODB_PORT)/$(MONGODB_DATABASE)"
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)/$(REDIS_DB)"
+        - name: WORKER_TYPE
+          value: "training"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: DATABASE_HOST
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: DATABASE_PASSWORD
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: MONGODB_HOST
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: MONGODB_PASSWORD
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: REDIS_HOST
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: REDIS_PASSWORD
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: ENVIRONMENT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: LOG_LEVEL
+        volumeMounts:
+        - name: data-storage
+          mountPath: /app/data
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: checkpoints-storage
+          mountPath: /app/checkpoints
+        - name: models-storage
+          mountPath: /app/models
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "16Gi"
+            cpu: "8000m"
+            nvidia.com/gpu: 1
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: automl-data-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: automl-logs-pvc
+      - name: checkpoints-storage
+        persistentVolumeClaim:
+          claimName: automl-checkpoints-pvc
+      - name: models-storage
+        persistentVolumeClaim:
+          claimName: automl-models-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nas-worker
+  namespace: automl
+  labels:
+    app: nas-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nas-worker
+  template:
+    metadata:
+      labels:
+        app: nas-worker
+    spec:
+      nodeSelector:
+        accelerator: nvidia-tesla-v100
+      containers:
+      - name: nas-worker
+        image: automl/worker:latest
+        command: ["python", "-m", "automl_framework.services.nas_service"]
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://automl:$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)"
+        - name: MONGODB_URL
+          value: "mongodb://automl:$(MONGODB_PASSWORD)@$(MONGODB_HOST):$(MONGODB_PORT)/$(MONGODB_DATABASE)"
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)/$(REDIS_DB)"
+        - name: WORKER_TYPE
+          value: "nas"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: DATABASE_HOST
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: DATABASE_PASSWORD
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: MONGODB_HOST
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: MONGODB_PASSWORD
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: REDIS_HOST
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: REDIS_PASSWORD
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: ENVIRONMENT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: LOG_LEVEL
+        volumeMounts:
+        - name: data-storage
+          mountPath: /app/data
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: checkpoints-storage
+          mountPath: /app/checkpoints
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+            nvidia.com/gpu: 1
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: automl-data-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: automl-logs-pvc
+      - name: checkpoints-storage
+        persistentVolumeClaim:
+          claimName: automl-checkpoints-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hpo-worker
+  namespace: automl
+  labels:
+    app: hpo-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hpo-worker
+  template:
+    metadata:
+      labels:
+        app: hpo-worker
+    spec:
+      containers:
+      - name: hpo-worker
+        image: automl/worker:latest
+        command: ["python", "-m", "automl_framework.services.hyperparameter_optimization"]
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://automl:$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)"
+        - name: MONGODB_URL
+          value: "mongodb://automl:$(MONGODB_PASSWORD)@$(MONGODB_HOST):$(MONGODB_PORT)/$(MONGODB_DATABASE)"
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)/$(REDIS_DB)"
+        - name: WORKER_TYPE
+          value: "hpo"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: DATABASE_HOST
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: DATABASE_PASSWORD
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: MONGODB_HOST
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: MONGODB_PASSWORD
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: REDIS_HOST
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automl-secrets
+              key: REDIS_PASSWORD
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: ENVIRONMENT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: automl-config
+              key: LOG_LEVEL
+        volumeMounts:
+        - name: data-storage
+          mountPath: /app/data
+        - name: logs-storage
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: automl-data-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: automl-logs-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: automl-checkpoints-pvc
+  namespace: automl
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: shared-storage

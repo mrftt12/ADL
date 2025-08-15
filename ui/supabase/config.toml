@@ -1,0 +1,4 @@
+project_id = "ktgzaciforpkhnfdtbqm"
+
+[functions.experiment-runner]
+verify_jwt = false

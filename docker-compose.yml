@@ -1,0 +1,320 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: automl-postgres
+    environment:
+      POSTGRES_DB: automl
+      POSTGRES_USER: automl
+      POSTGRES_PASSWORD: automl_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U automl -d automl"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - automl-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: automl-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: automl
+      MONGO_INITDB_ROOT_PASSWORD: automl_password
+      MONGO_INITDB_DATABASE: automl
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/automl --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - automl-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: automl-redis
+    command: redis-server --appendonly yes --requirepass automl_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - automl-network
+
+  # AutoML API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: automl-api
+    environment:
+      - DATABASE_URL=postgresql://automl:automl_password@postgres:5432/automl
+      - MONGODB_URL=mongodb://automl:automl_password@mongodb:27017/automl
+      - REDIS_URL=redis://:automl_password@redis:6379/0
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./checkpoints:/app/checkpoints
+      - ./models:/app/models
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - automl-network
+
+  # Training Worker Service
+  training-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: automl-training-worker
+    environment:
+      - DATABASE_URL=postgresql://automl:automl_password@postgres:5432/automl
+      - MONGODB_URL=mongodb://automl:automl_password@mongodb:27017/automl
+      - REDIS_URL=redis://:automl_password@redis:6379/0
+      - WORKER_TYPE=training
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./checkpoints:/app/checkpoints
+      - ./models:/app/models
+    command: python -m automl_framework.services.training_service
+    depends_on:
+      - api
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - automl-network
+
+  # NAS Worker Service
+  nas-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: automl-nas-worker
+    environment:
+      - DATABASE_URL=postgresql://automl:automl_password@postgres:5432/automl
+      - MONGODB_URL=mongodb://automl:automl_password@mongodb:27017/automl
+      - REDIS_URL=redis://:automl_password@redis:6379/0
+      - WORKER_TYPE=nas
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./checkpoints:/app/checkpoints
+    command: python -m automl_framework.services.nas_service
+    depends_on:
+      - api
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - automl-network
+
+  # HPO Worker Service
+  hpo-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: automl-hpo-worker
+    environment:
+      - DATABASE_URL=postgresql://automl:automl_password@postgres:5432/automl
+      - MONGODB_URL=mongodb://automl:automl_password@mongodb:27017/automl
+      - REDIS_URL=redis://:automl_password@redis:6379/0
+      - WORKER_TYPE=hpo
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    command: python -m automl_framework.services.hyperparameter_optimization
+    depends_on:
+      - api
+    networks:
+      - automl-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: automl-frontend
+    ports:
+      - "3000:8080"
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - automl-network
+
+  # Monitoring Services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: automl-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - automl-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: automl-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/automl-dashboard.json
+    depends_on:
+      - prometheus
+    networks:
+      - automl-network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: automl-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./docker/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    networks:
+      - automl-network
+
+  # Exporters for monitoring
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: automl-node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - automl-network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: automl-postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://automl:automl_password@postgres:5432/automl?sslmode=disable"
+    depends_on:
+      - postgres
+    networks:
+      - automl-network
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: automl-redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: "redis://redis:6379"
+      REDIS_PASSWORD: "automl_password"
+    depends_on:
+      - redis
+    networks:
+      - automl-network
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: automl-cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - automl-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
+
+networks:
+  automl-network:
+    driver: bridge

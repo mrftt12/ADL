@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoML UI Auth Test</title>
+</head>
+<body>
+    <h1>AutoML Authentication Test</h1>
+    
+    <div>
+        <h2>Login Test</h2>
+        <button onclick="testLogin()">Test Demo Login</button>
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>Signup Test</h2>
+        <button onclick="testSignup()">Test Signup</button>
+        <div id="signupResult"></div>
+    </div>
+    
+    <div>
+        <h2>User Info Test</h2>
+        <button onclick="testUserInfo()">Get User Info</button>
+        <div id="userResult"></div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', 'demo_user');
+                formData.append('password', 'secret');
+                
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.access_token;
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Login Successful!</strong><br>
+                            Token: ${data.access_token.substring(0, 50)}...<br>
+                            Type: ${data.token_type}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Login Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testAdminLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Testing admin login...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', 'admin');
+                formData.append('password', 'secret');
+                
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.access_token;
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Admin Login Successful!</strong><br>
+                            Token: ${data.access_token.substring(0, 50)}...<br>
+                            Type: ${data.token_type}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Admin Login Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testSignup() {
+            const resultDiv = document.getElementById('signupResult');
+            resultDiv.innerHTML = 'Testing signup...';
+            
+            const randomId = Math.floor(Math.random() * 10000);
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: `newuser${randomId}`,
+                        email: `newuser${randomId}@example.com`,
+                        password: 'password123',
+                        confirm_password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Signup Successful!</strong><br>
+                            ID: ${data.id}<br>
+                            Username: ${data.username}<br>
+                            Email: ${data.email}<br>
+                            Active: ${data.is_active}<br>
+                            Admin: ${data.is_admin}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Signup Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function testUserInfo() {
+            const resultDiv = document.getElementById('userResult');
+            
+            if (!currentToken) {
+                resultDiv.innerHTML = '<div style="color: orange;">Please login first</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Getting user info...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>User Info:</strong><br>
+                            ID: ${data.id}<br>
+                            Username: ${data.username}<br>
+                            Email: ${data.email}<br>
+                            Active: ${data.is_active}<br>
+                            Admin: ${data.is_admin}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>User Info Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

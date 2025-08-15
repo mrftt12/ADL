@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dataset Delete Test</title>
+</head>
+<body>
+    <h1>Dataset Delete Functionality Test</h1>
+    
+    <div>
+        <h2>Authentication</h2>
+        <button onclick="testLogin()">Login</button>
+        <div id="authResult"></div>
+    </div>
+    
+    <div>
+        <h2>Dataset Operations</h2>
+        <button onclick="listDatasets()">List Datasets</button>
+        <button onclick="deleteFirstDataset()">Delete First Dataset</button>
+        <div id="datasetResult"></div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        let datasets = [];
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = 'Logging in...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', 'demo_user');
+                formData.append('password', 'secret');
+                
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.access_token;
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Login Successful!</strong><br>
+                            Token: ${data.access_token.substring(0, 50)}...
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Login Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function listDatasets() {
+            const resultDiv = document.getElementById('datasetResult');
+            
+            if (!currentToken) {
+                resultDiv.innerHTML = '<div style="color: orange;">Please login first</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Loading datasets...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/datasets', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    datasets = data.datasets;
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Datasets (${datasets.length}):</strong><br>
+                            ${datasets.map(d => `
+                                <div style="margin: 5px 0; padding: 5px; border: 1px solid #ccc;">
+                                    <strong>ID:</strong> ${d.dataset_id}<br>
+                                    <strong>Filename:</strong> ${d.filename}<br>
+                                    <strong>Size:</strong> ${(d.size_bytes / 1024).toFixed(2)} KB
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Failed to load datasets:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function deleteFirstDataset() {
+            const resultDiv = document.getElementById('datasetResult');
+            
+            if (!currentToken) {
+                resultDiv.innerHTML = '<div style="color: orange;">Please login first</div>';
+                return;
+            }
+            
+            if (datasets.length === 0) {
+                resultDiv.innerHTML = '<div style="color: orange;">Please list datasets first</div>';
+                return;
+            }
+            
+            const datasetToDelete = datasets[0];
+            const confirmed = confirm(`Delete dataset "${datasetToDelete.filename}"?`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            resultDiv.innerHTML = `Deleting dataset ${datasetToDelete.dataset_id}...`;
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/datasets/${datasetToDelete.dataset_id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <strong>Dataset Deleted Successfully!</strong><br>
+                            ${data.message}<br>
+                            <button onclick="listDatasets()" style="margin-top: 10px;">Refresh List</button>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: red;">
+                            <strong>Delete Failed:</strong><br>
+                            ${data.detail || JSON.stringify(data)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

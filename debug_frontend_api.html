@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML API Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info {
+            color: #0c5460;
+            background: #d1ecf1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>AutoML Framework API Debug Tool</h1>
+    
+    <div class="container">
+        <h2>API Configuration</h2>
+        <div class="info">
+            <strong>API Base URL:</strong> <span id="api-url">http://localhost:8000</span><br>
+            <strong>Frontend URL:</strong> <span id="frontend-url">http://localhost:3000</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Authentication Test</h2>
+        <div class="form-group">
+            <label>Username:</label>
+            <input type="text" id="username" value="demo_user" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="password" value="secret" placeholder="Enter password">
+        </div>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testLogout()">Test Logout</button>
+        <button onclick="clearToken()">Clear Token</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="container">
+        <h2>API Tests</h2>
+        <button onclick="testHealthCheck()">Health Check</button>
+        <button onclick="testGetDatasets()">Get Datasets</button>
+        <button onclick="testGetCurrentUser()">Get Current User</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="container">
+        <h2>Token Information</h2>
+        <button onclick="showTokenInfo()">Show Token Info</button>
+        <div id="token-info"></div>
+    </div>
+
+    <div class="container">
+        <h2>Network Test</h2>
+        <button onclick="testCORS()">Test CORS</button>
+        <button onclick="testNetworkConnectivity()">Test Network</button>
+        <div id="network-result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        let currentToken = null;
+
+        // Load token from localStorage
+        function loadToken() {
+            currentToken = localStorage.getItem('automl_token');
+            return currentToken;
+        }
+
+        // Save token to localStorage
+        function saveToken(token) {
+            currentToken = token;
+            localStorage.setItem('automl_token', token);
+        }
+
+        // Clear token
+        function clearToken() {
+            currentToken = null;
+            localStorage.removeItem('automl_token');
+            showResult('auth-result', 'Token cleared', 'info');
+            showTokenInfo();
+        }
+
+        // Show result in a div
+        function showResult(divId, message, type = 'info') {
+            const div = document.getElementById(divId);
+            div.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        // Show JSON result
+        function showJsonResult(divId, data, type = 'info') {
+            const div = document.getElementById(divId);
+            div.innerHTML = `<div class="${type}"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+        }
+
+        // Make API request
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            if (currentToken) {
+                headers.Authorization = `Bearer ${currentToken}`;
+            }
+
+            try {
+                console.log(`Making request to: ${url}`);
+                console.log('Headers:', headers);
+                
+                const response = await fetch(url, {
+                    ...options,
+                    headers,
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                console.error('Request error:', error);
+                return {
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // Test login
+        async function testLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showResult('auth-result', 'Please enter username and password', 'error');
+                return;
+            }
+
+            showResult('auth-result', 'Logging in...', 'info');
+
+            try {
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('password', password);
+
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    saveToken(data.access_token);
+                    showJsonResult('auth-result', {
+                        success: true,
+                        message: 'Login successful!',
+                        token_type: data.token_type,
+                        token_preview: data.access_token.substring(0, 50) + '...'
+                    }, 'success');
+                    showTokenInfo();
+                } else {
+                    showJsonResult('auth-result', {
+                        success: false,
+                        error: data.detail || 'Login failed'
+                    }, 'error');
+                }
+            } catch (error) {
+                showResult('auth-result', `Login error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test logout
+        async function testLogout() {
+            if (!currentToken) {
+                showResult('auth-result', 'No token to logout', 'error');
+                return;
+            }
+
+            const result = await makeRequest('/api/v1/auth/logout', {
+                method: 'POST'
+            });
+
+            if (result.ok) {
+                clearToken();
+                showResult('auth-result', 'Logout successful', 'success');
+            } else {
+                showJsonResult('auth-result', result, 'error');
+            }
+        }
+
+        // Test health check
+        async function testHealthCheck() {
+            showResult('api-result', 'Checking health...', 'info');
+            
+            const result = await makeRequest('/health');
+            
+            if (result.ok) {
+                showJsonResult('api-result', {
+                    success: true,
+                    message: 'API is healthy!',
+                    data: result.data
+                }, 'success');
+            } else {
+                showJsonResult('api-result', result, 'error');
+            }
+        }
+
+        // Test get datasets
+        async function testGetDatasets() {
+            if (!currentToken) {
+                showResult('api-result', 'Please login first', 'error');
+                return;
+            }
+
+            showResult('api-result', 'Getting datasets...', 'info');
+            
+            const result = await makeRequest('/api/v1/datasets');
+            
+            if (result.ok) {
+                showJsonResult('api-result', {
+                    success: true,
+                    message: 'Datasets retrieved successfully!',
+                    count: result.data.datasets?.length || 0,
+                    data: result.data
+                }, 'success');
+            } else {
+                showJsonResult('api-result', result, 'error');
+            }
+        }
+
+        // Test get current user
+        async function testGetCurrentUser() {
+            if (!currentToken) {
+                showResult('api-result', 'Please login first', 'error');
+                return;
+            }
+
+            showResult('api-result', 'Getting current user...', 'info');
+            
+            const result = await makeRequest('/api/v1/auth/me');
+            
+            if (result.ok) {
+                showJsonResult('api-result', {
+                    success: true,
+                    message: 'User info retrieved successfully!',
+                    data: result.data
+                }, 'success');
+            } else {
+                showJsonResult('api-result', result, 'error');
+            }
+        }
+
+        // Show token info
+        function showTokenInfo() {
+            loadToken();
+            
+            if (!currentToken) {
+                showResult('token-info', 'No token stored', 'info');
+                return;
+            }
+
+            try {
+                // Decode JWT token (basic decoding, not verification)
+                const parts = currentToken.split('.');
+                const header = JSON.parse(atob(parts[0]));
+                const payload = JSON.parse(atob(parts[1]));
+                
+                showJsonResult('token-info', {
+                    token_preview: currentToken.substring(0, 50) + '...',
+                    header: header,
+                    payload: payload,
+                    expires: new Date(payload.exp * 1000).toLocaleString(),
+                    is_expired: Date.now() > payload.exp * 1000
+                }, 'info');
+            } catch (error) {
+                showResult('token-info', `Invalid token format: ${error.message}`, 'error');
+            }
+        }
+
+        // Test CORS
+        async function testCORS() {
+            showResult('network-result', 'Testing CORS...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    showResult('network-result', 'CORS test successful - API is accessible', 'success');
+                } else {
+                    showResult('network-result', `CORS test failed - HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    showResult('network-result', `CORS error: ${error.message}`, 'error');
+                } else {
+                    showResult('network-result', `Network error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Test network connectivity
+        async function testNetworkConnectivity() {
+            showResult('network-result', 'Testing network connectivity...', 'info');
+            
+            const tests = [
+                { name: 'API Health Check', url: `${API_BASE_URL}/health` },
+                { name: 'API Docs', url: `${API_BASE_URL}/docs` },
+                { name: 'Frontend', url: 'http://localhost:3000' }
+            ];
+
+            const results = [];
+
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url, { method: 'HEAD' });
+                    results.push({
+                        name: test.name,
+                        url: test.url,
+                        status: response.status,
+                        success: response.ok
+                    });
+                } catch (error) {
+                    results.push({
+                        name: test.name,
+                        url: test.url,
+                        error: error.message,
+                        success: false
+                    });
+                }
+            }
+
+            showJsonResult('network-result', {
+                message: 'Network connectivity test results',
+                results: results
+            }, 'info');
+        }
+
+        // Initialize
+        window.onload = function() {
+            loadToken();
+            showTokenInfo();
+            
+            // Update URLs in the info section
+            document.getElementById('api-url').textContent = API_BASE_URL;
+            document.getElementById('frontend-url').textContent = window.location.origin;
+        };
+    </script>
+</body>
+</html>

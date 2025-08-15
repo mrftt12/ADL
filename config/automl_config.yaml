@@ -1,0 +1,52 @@
+# AutoML Framework Configuration
+
+database:
+  postgresql_url: "postgresql://localhost:5432/automl"
+  mongodb_url: "mongodb://localhost:27017/automl"
+  redis_url: "redis://localhost:6379/0"
+
+resources:
+  max_concurrent_experiments: 5
+  max_gpu_per_experiment: 4
+  default_gpu_memory_limit: "8GB"
+  job_timeout_hours: 24
+  checkpoint_interval_minutes: 30
+
+training:
+  default_epochs: 100
+  early_stopping_patience: 10
+  default_batch_size: 32
+  default_learning_rate: 0.001
+  mixed_precision: true
+
+nas:
+  search_time_limit_hours: 12
+  max_architectures_to_evaluate: 50
+  population_size: 20
+  mutation_rate: 0.1
+
+hpo:
+  max_trials: 100
+  optimization_time_limit_hours: 6
+  n_startup_trials: 10
+  n_ei_candidates: 24
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  max_upload_size_mb: 1000
+  cors_origins: ["*"]
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_path: "./logs/automl.log"
+  max_file_size_mb: 100
+  backup_count: 5
+
+# Storage paths
+data_storage_path: "./data"
+model_storage_path: "./models"
+checkpoint_storage_path: "./checkpoints"
+log_storage_path: "./logs"

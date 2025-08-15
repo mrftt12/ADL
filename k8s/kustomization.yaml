@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: automl
+
+resources:
+- namespace.yaml
+- configmap.yaml
+- postgres.yaml
+- mongodb.yaml
+- redis.yaml
+- api.yaml
+- workers.yaml
+- frontend.yaml
+- service-monitor.yaml
+
+images:
+- name: automl/api
+  newTag: latest
+- name: automl/worker
+  newTag: latest
+- name: automl/frontend
+  newTag: latest
+
+commonLabels:
+  project: automl
+  environment: production
+
+patchesStrategicMerge:
+- patches/production-resources.yaml
+
+configMapGenerator:
+- name: automl-version
+  literals:
+  - version=1.0.0
+  - build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+secretGenerator:
+- name: automl-secrets
+  type: Opaque
+  files:
+  - secrets/database-password
+  - secrets/mongodb-password
+  - secrets/redis-password
+  - secrets/jwt-secret
