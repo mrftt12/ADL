@@ -1,0 +1,601 @@
+text,sentiment,length
+"Standard product, no complaints but not impressed. Additional context 93.",1,73
+"Decent item, meets basic requirements. Additional context 72.",1,61
+Perfect solution to my problem. Very satisfied! Additional context 83.,2,70
+"Decent item, meets basic requirements. Additional context 75.",1,61
+Outstanding customer service and great value. Additional context 24.,2,68
+"Fair value, does what it's supposed to do. Additional context 2.",1,64
+"Worst purchase ever, complete waste of money. Additional context 64.",0,68
+This product is amazing and works perfectly! Additional context 76.,2,67
+Very disappointed with this purchase. Additional context 89.,0,60
+"Love this item, exactly what I was looking for. Additional context 59.",2,70
+Average quality for the price point. Additional context 92.,1,59
+"Decent item, meets basic requirements. Additional context 55.",1,61
+"Love this item, exactly what I was looking for. Additional context 51.",2,70
+"Fair value, does what it's supposed to do. Additional context 73.",1,65
+Average quality for the price point. Additional context 4.,1,58
+Outstanding customer service and great value. Additional context 14.,2,68
+"Worst purchase ever, complete waste of money. Additional context 9.",0,67
+Very disappointed with this purchase. Additional context 2.,0,59
+"Standard product, no complaints but not impressed. Additional context 71.",1,73
+"Love this item, exactly what I was looking for. Additional context 78.",2,70
+Outstanding customer service and great value. Additional context 50.,2,68
+"Worst purchase ever, complete waste of money. Additional context 4.",0,67
+Very disappointed with this purchase. Additional context 63.,0,60
+"Worst purchase ever, complete waste of money. Additional context 44.",0,68
+"Worst purchase ever, complete waste of money. Additional context 62.",0,68
+Product doesn't match description at all. Additional context 62.,0,64
+Perfect solution to my problem. Very satisfied! Additional context 82.,2,70
+"Fair value, does what it's supposed to do. Additional context 24.",1,65
+"Terrible quality, broke after one day. Additional context 60.",0,61
+This product is amazing and works perfectly! Additional context 29.,2,67
+"Fair value, does what it's supposed to do. Additional context 65.",1,65
+This product is amazing and works perfectly! Additional context 88.,2,67
+Outstanding customer service and great value. Additional context 8.,2,67
+"Decent item, meets basic requirements. Additional context 81.",1,61
+"Decent item, meets basic requirements. Additional context 33.",1,61
+"Fair value, does what it's supposed to do. Additional context 41.",1,65
+"Product is okay, nothing special but works. Additional context 72.",1,66
+"Terrible quality, broke after one day. Additional context 48.",0,61
+"Fair value, does what it's supposed to do. Additional context 99.",1,65
+Poor customer service and delayed shipping. Additional context 35.,0,66
+"Love this item, exactly what I was looking for. Additional context 47.",2,70
+Poor customer service and delayed shipping. Additional context 1.,0,65
+Excellent quality and fast delivery. Highly recommended! Additional context 14.,2,79
+"Decent item, meets basic requirements. Additional context 9.",1,60
+Average quality for the price point. Additional context 42.,1,59
+"Love this item, exactly what I was looking for. Additional context 63.",2,70
+"Product is okay, nothing special but works. Additional context 52.",1,66
+Outstanding customer service and great value. Additional context 94.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 15.,2,70
+"Fair value, does what it's supposed to do. Additional context 36.",1,65
+"Love this item, exactly what I was looking for. Additional context 86.",2,70
+"Worst purchase ever, complete waste of money. Additional context 45.",0,68
+"Terrible quality, broke after one day. Additional context 6.",0,60
+Poor customer service and delayed shipping. Additional context 92.,0,66
+This product is amazing and works perfectly! Additional context 1.,2,66
+"Love this item, exactly what I was looking for. Additional context 62.",2,70
+Outstanding customer service and great value. Additional context 77.,2,68
+"Love this item, exactly what I was looking for. Additional context 70.",2,70
+"Product is okay, nothing special but works. Additional context 62.",1,66
+This product is amazing and works perfectly! Additional context 51.,2,67
+Product doesn't match description at all. Additional context 24.,0,64
+"Decent item, meets basic requirements. Additional context 32.",1,61
+Outstanding customer service and great value. Additional context 62.,2,68
+Excellent quality and fast delivery. Highly recommended! Additional context 52.,2,79
+"Worst purchase ever, complete waste of money. Additional context 3.",0,67
+Perfect solution to my problem. Very satisfied! Additional context 56.,2,70
+"Love this item, exactly what I was looking for. Additional context 2.",2,69
+Product doesn't match description at all. Additional context 54.,0,64
+"Fair value, does what it's supposed to do. Additional context 96.",1,65
+This product is amazing and works perfectly! Additional context 19.,2,67
+"Worst purchase ever, complete waste of money. Additional context 53.",0,68
+Product doesn't match description at all. Additional context 55.,0,64
+"Decent item, meets basic requirements. Additional context 17.",1,61
+"Fair value, does what it's supposed to do. Additional context 98.",1,65
+Poor customer service and delayed shipping. Additional context 16.,0,66
+This product is amazing and works perfectly! Additional context 59.,2,67
+Very disappointed with this purchase. Additional context 3.,0,59
+"Standard product, no complaints but not impressed. Additional context 19.",1,73
+Poor customer service and delayed shipping. Additional context 19.,0,66
+"Standard product, no complaints but not impressed. Additional context 33.",1,73
+Average quality for the price point. Additional context 1.,1,58
+"Standard product, no complaints but not impressed. Additional context 57.",1,73
+Excellent quality and fast delivery. Highly recommended! Additional context 23.,2,79
+Average quality for the price point. Additional context 99.,1,59
+"Standard product, no complaints but not impressed. Additional context 16.",1,73
+"Terrible quality, broke after one day. Additional context 60.",0,61
+Excellent quality and fast delivery. Highly recommended! Additional context 1.,2,78
+Product doesn't match description at all. Additional context 69.,0,64
+"Love this item, exactly what I was looking for. Additional context 9.",2,69
+"Love this item, exactly what I was looking for. Additional context 19.",2,70
+"Standard product, no complaints but not impressed. Additional context 24.",1,73
+"Terrible quality, broke after one day. Additional context 24.",0,61
+"Product is okay, nothing special but works. Additional context 72.",1,66
+Product doesn't match description at all. Additional context 99.,0,64
+"Terrible quality, broke after one day. Additional context 99.",0,61
+Perfect solution to my problem. Very satisfied! Additional context 18.,2,70
+"Worst purchase ever, complete waste of money. Additional context 66.",0,68
+Poor customer service and delayed shipping. Additional context 80.,0,66
+This product is amazing and works perfectly! Additional context 33.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 48.,2,70
+"Decent item, meets basic requirements. Additional context 17.",1,61
+Outstanding customer service and great value. Additional context 59.,2,68
+"Fair value, does what it's supposed to do. Additional context 51.",1,65
+Poor customer service and delayed shipping. Additional context 27.,0,66
+Very disappointed with this purchase. Additional context 30.,0,60
+Outstanding customer service and great value. Additional context 64.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 61.,2,70
+"Standard product, no complaints but not impressed. Additional context 35.",1,73
+This product is amazing and works perfectly! Additional context 44.,2,67
+Very disappointed with this purchase. Additional context 46.,0,60
+"Love this item, exactly what I was looking for. Additional context 37.",2,70
+This product is amazing and works perfectly! Additional context 46.,2,67
+"Love this item, exactly what I was looking for. Additional context 60.",2,70
+Outstanding customer service and great value. Additional context 63.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 32.,2,70
+"Product is okay, nothing special but works. Additional context 67.",1,66
+"Terrible quality, broke after one day. Additional context 95.",0,61
+"Worst purchase ever, complete waste of money. Additional context 67.",0,68
+"Worst purchase ever, complete waste of money. Additional context 32.",0,68
+Average quality for the price point. Additional context 27.,1,59
+"Worst purchase ever, complete waste of money. Additional context 90.",0,68
+This product is amazing and works perfectly! Additional context 9.,2,66
+"Fair value, does what it's supposed to do. Additional context 42.",1,65
+Average quality for the price point. Additional context 99.,1,59
+"Terrible quality, broke after one day. Additional context 24.",0,61
+Outstanding customer service and great value. Additional context 7.,2,67
+Outstanding customer service and great value. Additional context 45.,2,68
+Outstanding customer service and great value. Additional context 87.,2,68
+"Standard product, no complaints but not impressed. Additional context 98.",1,73
+Poor customer service and delayed shipping. Additional context 25.,0,66
+Very disappointed with this purchase. Additional context 22.,0,60
+"Worst purchase ever, complete waste of money. Additional context 86.",0,68
+Outstanding customer service and great value. Additional context 42.,2,68
+Poor customer service and delayed shipping. Additional context 60.,0,66
+This product is amazing and works perfectly! Additional context 8.,2,66
+Outstanding customer service and great value. Additional context 5.,2,67
+"Standard product, no complaints but not impressed. Additional context 6.",1,72
+Outstanding customer service and great value. Additional context 94.,2,68
+"Decent item, meets basic requirements. Additional context 55.",1,61
+Excellent quality and fast delivery. Highly recommended! Additional context 30.,2,79
+"Product is okay, nothing special but works. Additional context 63.",1,66
+"Standard product, no complaints but not impressed. Additional context 58.",1,73
+Average quality for the price point. Additional context 90.,1,59
+This product is amazing and works perfectly! Additional context 12.,2,67
+This product is amazing and works perfectly! Additional context 58.,2,67
+"Terrible quality, broke after one day. Additional context 34.",0,61
+"Terrible quality, broke after one day. Additional context 1.",0,60
+Perfect solution to my problem. Very satisfied! Additional context 22.,2,70
+"Love this item, exactly what I was looking for. Additional context 76.",2,70
+Poor customer service and delayed shipping. Additional context 86.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 78.,2,70
+This product is amazing and works perfectly! Additional context 94.,2,67
+Product doesn't match description at all. Additional context 69.,0,64
+"Worst purchase ever, complete waste of money. Additional context 48.",0,68
+Outstanding customer service and great value. Additional context 33.,2,68
+Very disappointed with this purchase. Additional context 23.,0,60
+"Worst purchase ever, complete waste of money. Additional context 69.",0,68
+Product doesn't match description at all. Additional context 95.,0,64
+"Worst purchase ever, complete waste of money. Additional context 19.",0,68
+"Terrible quality, broke after one day. Additional context 69.",0,61
+Outstanding customer service and great value. Additional context 16.,2,68
+Average quality for the price point. Additional context 92.,1,59
+"Standard product, no complaints but not impressed. Additional context 24.",1,73
+Poor customer service and delayed shipping. Additional context 33.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 51.,2,70
+"Fair value, does what it's supposed to do. Additional context 12.",1,65
+"Product is okay, nothing special but works. Additional context 33.",1,66
+Poor customer service and delayed shipping. Additional context 44.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 12.,2,70
+Average quality for the price point. Additional context 35.,1,59
+"Product is okay, nothing special but works. Additional context 90.",1,66
+Excellent quality and fast delivery. Highly recommended! Additional context 74.,2,79
+"Worst purchase ever, complete waste of money. Additional context 7.",0,67
+Very disappointed with this purchase. Additional context 75.,0,60
+Outstanding customer service and great value. Additional context 89.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 36.,2,70
+Very disappointed with this purchase. Additional context 73.,0,60
+"Product is okay, nothing special but works. Additional context 99.",1,66
+"Terrible quality, broke after one day. Additional context 96.",0,61
+"Fair value, does what it's supposed to do. Additional context 12.",1,65
+Perfect solution to my problem. Very satisfied! Additional context 23.,2,70
+"Love this item, exactly what I was looking for. Additional context 30.",2,70
+This product is amazing and works perfectly! Additional context 62.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 59.,2,70
+"Product is okay, nothing special but works. Additional context 12.",1,66
+This product is amazing and works perfectly! Additional context 19.,2,67
+Outstanding customer service and great value. Additional context 78.,2,68
+"Standard product, no complaints but not impressed. Additional context 83.",1,73
+Very disappointed with this purchase. Additional context 69.,0,60
+"Standard product, no complaints but not impressed. Additional context 25.",1,73
+"Fair value, does what it's supposed to do. Additional context 53.",1,65
+"Product is okay, nothing special but works. Additional context 39.",1,66
+Perfect solution to my problem. Very satisfied! Additional context 42.,2,70
+"Worst purchase ever, complete waste of money. Additional context 5.",0,67
+"Fair value, does what it's supposed to do. Additional context 75.",1,65
+Product doesn't match description at all. Additional context 9.,0,63
+"Worst purchase ever, complete waste of money. Additional context 17.",0,68
+Perfect solution to my problem. Very satisfied! Additional context 40.,2,70
+"Terrible quality, broke after one day. Additional context 50.",0,61
+Average quality for the price point. Additional context 66.,1,59
+Perfect solution to my problem. Very satisfied! Additional context 37.,2,70
+Poor customer service and delayed shipping. Additional context 8.,0,65
+This product is amazing and works perfectly! Additional context 86.,2,67
+This product is amazing and works perfectly! Additional context 45.,2,67
+Product doesn't match description at all. Additional context 31.,0,64
+"Fair value, does what it's supposed to do. Additional context 54.",1,65
+"Decent item, meets basic requirements. Additional context 74.",1,61
+Poor customer service and delayed shipping. Additional context 39.,0,66
+Poor customer service and delayed shipping. Additional context 45.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 92.,2,79
+"Worst purchase ever, complete waste of money. Additional context 20.",0,68
+This product is amazing and works perfectly! Additional context 39.,2,67
+"Love this item, exactly what I was looking for. Additional context 77.",2,70
+"Terrible quality, broke after one day. Additional context 63.",0,61
+This product is amazing and works perfectly! Additional context 56.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 6.,2,69
+Product doesn't match description at all. Additional context 45.,0,64
+Perfect solution to my problem. Very satisfied! Additional context 47.,2,70
+Perfect solution to my problem. Very satisfied! Additional context 75.,2,70
+Outstanding customer service and great value. Additional context 99.,2,68
+"Standard product, no complaints but not impressed. Additional context 57.",1,73
+"Terrible quality, broke after one day. Additional context 49.",0,61
+"Terrible quality, broke after one day. Additional context 54.",0,61
+Poor customer service and delayed shipping. Additional context 16.,0,66
+"Product is okay, nothing special but works. Additional context 75.",1,66
+Product doesn't match description at all. Additional context 24.,0,64
+Excellent quality and fast delivery. Highly recommended! Additional context 92.,2,79
+"Worst purchase ever, complete waste of money. Additional context 60.",0,68
+Product doesn't match description at all. Additional context 92.,0,64
+This product is amazing and works perfectly! Additional context 64.,2,67
+"Product is okay, nothing special but works. Additional context 73.",1,66
+Perfect solution to my problem. Very satisfied! Additional context 84.,2,70
+Outstanding customer service and great value. Additional context 29.,2,68
+"Love this item, exactly what I was looking for. Additional context 6.",2,69
+Poor customer service and delayed shipping. Additional context 69.,0,66
+"Product is okay, nothing special but works. Additional context 66.",1,66
+"Worst purchase ever, complete waste of money. Additional context 5.",0,67
+"Product is okay, nothing special but works. Additional context 65.",1,66
+"Terrible quality, broke after one day. Additional context 11.",0,61
+Excellent quality and fast delivery. Highly recommended! Additional context 63.,2,79
+"Love this item, exactly what I was looking for. Additional context 27.",2,70
+Perfect solution to my problem. Very satisfied! Additional context 33.,2,70
+"Terrible quality, broke after one day. Additional context 99.",0,61
+"Product is okay, nothing special but works. Additional context 21.",1,66
+"Standard product, no complaints but not impressed. Additional context 81.",1,73
+Perfect solution to my problem. Very satisfied! Additional context 3.,2,69
+Perfect solution to my problem. Very satisfied! Additional context 53.,2,70
+Excellent quality and fast delivery. Highly recommended! Additional context 74.,2,79
+"Product is okay, nothing special but works. Additional context 85.",1,66
+"Terrible quality, broke after one day. Additional context 1.",0,60
+"Fair value, does what it's supposed to do. Additional context 77.",1,65
+"Terrible quality, broke after one day. Additional context 32.",0,61
+Product doesn't match description at all. Additional context 95.,0,64
+Average quality for the price point. Additional context 34.,1,59
+Poor customer service and delayed shipping. Additional context 50.,0,66
+Outstanding customer service and great value. Additional context 5.,2,67
+Poor customer service and delayed shipping. Additional context 57.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 85.,2,70
+"Worst purchase ever, complete waste of money. Additional context 75.",0,68
+"Standard product, no complaints but not impressed. Additional context 98.",1,73
+"Worst purchase ever, complete waste of money. Additional context 98.",0,68
+Poor customer service and delayed shipping. Additional context 51.,0,66
+Average quality for the price point. Additional context 52.,1,59
+This product is amazing and works perfectly! Additional context 88.,2,67
+"Standard product, no complaints but not impressed. Additional context 30.",1,73
+Average quality for the price point. Additional context 51.,1,59
+Perfect solution to my problem. Very satisfied! Additional context 29.,2,70
+"Terrible quality, broke after one day. Additional context 74.",0,61
+Outstanding customer service and great value. Additional context 84.,2,68
+Excellent quality and fast delivery. Highly recommended! Additional context 6.,2,78
+Excellent quality and fast delivery. Highly recommended! Additional context 77.,2,79
+Poor customer service and delayed shipping. Additional context 43.,0,66
+"Decent item, meets basic requirements. Additional context 23.",1,61
+"Decent item, meets basic requirements. Additional context 16.",1,61
+"Love this item, exactly what I was looking for. Additional context 96.",2,70
+"Decent item, meets basic requirements. Additional context 93.",1,61
+Very disappointed with this purchase. Additional context 51.,0,60
+"Fair value, does what it's supposed to do. Additional context 5.",1,64
+Product doesn't match description at all. Additional context 42.,0,64
+Perfect solution to my problem. Very satisfied! Additional context 70.,2,70
+Perfect solution to my problem. Very satisfied! Additional context 12.,2,70
+"Worst purchase ever, complete waste of money. Additional context 49.",0,68
+"Worst purchase ever, complete waste of money. Additional context 45.",0,68
+"Product is okay, nothing special but works. Additional context 26.",1,66
+This product is amazing and works perfectly! Additional context 86.,2,67
+"Decent item, meets basic requirements. Additional context 63.",1,61
+This product is amazing and works perfectly! Additional context 26.,2,67
+This product is amazing and works perfectly! Additional context 99.,2,67
+Outstanding customer service and great value. Additional context 79.,2,68
+Average quality for the price point. Additional context 28.,1,59
+Average quality for the price point. Additional context 26.,1,59
+Poor customer service and delayed shipping. Additional context 56.,0,66
+"Decent item, meets basic requirements. Additional context 23.",1,61
+Poor customer service and delayed shipping. Additional context 18.,0,66
+Poor customer service and delayed shipping. Additional context 15.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 28.,2,70
+"Terrible quality, broke after one day. Additional context 17.",0,61
+Average quality for the price point. Additional context 44.,1,59
+This product is amazing and works perfectly! Additional context 13.,2,67
+Outstanding customer service and great value. Additional context 10.,2,68
+"Product is okay, nothing special but works. Additional context 18.",1,66
+"Standard product, no complaints but not impressed. Additional context 86.",1,73
+"Terrible quality, broke after one day. Additional context 83.",0,61
+"Terrible quality, broke after one day. Additional context 6.",0,60
+"Worst purchase ever, complete waste of money. Additional context 59.",0,68
+"Fair value, does what it's supposed to do. Additional context 70.",1,65
+This product is amazing and works perfectly! Additional context 33.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 70.,2,70
+Product doesn't match description at all. Additional context 94.,0,64
+"Product is okay, nothing special but works. Additional context 3.",1,65
+"Fair value, does what it's supposed to do. Additional context 36.",1,65
+Average quality for the price point. Additional context 84.,1,59
+"Standard product, no complaints but not impressed. Additional context 79.",1,73
+"Terrible quality, broke after one day. Additional context 94.",0,61
+Poor customer service and delayed shipping. Additional context 62.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 79.,2,79
+Average quality for the price point. Additional context 51.,1,59
+Outstanding customer service and great value. Additional context 5.,2,67
+"Worst purchase ever, complete waste of money. Additional context 68.",0,68
+"Standard product, no complaints but not impressed. Additional context 97.",1,73
+Outstanding customer service and great value. Additional context 47.,2,68
+Excellent quality and fast delivery. Highly recommended! Additional context 14.,2,79
+Very disappointed with this purchase. Additional context 11.,0,60
+"Standard product, no complaints but not impressed. Additional context 77.",1,73
+"Decent item, meets basic requirements. Additional context 33.",1,61
+"Worst purchase ever, complete waste of money. Additional context 10.",0,68
+Excellent quality and fast delivery. Highly recommended! Additional context 44.,2,79
+Very disappointed with this purchase. Additional context 40.,0,60
+Product doesn't match description at all. Additional context 65.,0,64
+"Fair value, does what it's supposed to do. Additional context 73.",1,65
+This product is amazing and works perfectly! Additional context 75.,2,67
+"Decent item, meets basic requirements. Additional context 94.",1,61
+"Product is okay, nothing special but works. Additional context 69.",1,66
+Product doesn't match description at all. Additional context 50.,0,64
+Very disappointed with this purchase. Additional context 75.,0,60
+Excellent quality and fast delivery. Highly recommended! Additional context 76.,2,79
+"Decent item, meets basic requirements. Additional context 1.",1,60
+Product doesn't match description at all. Additional context 64.,0,64
+"Love this item, exactly what I was looking for. Additional context 14.",2,70
+Poor customer service and delayed shipping. Additional context 85.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 83.,2,70
+Average quality for the price point. Additional context 62.,1,59
+Perfect solution to my problem. Very satisfied! Additional context 42.,2,70
+Excellent quality and fast delivery. Highly recommended! Additional context 40.,2,79
+"Decent item, meets basic requirements. Additional context 38.",1,61
+This product is amazing and works perfectly! Additional context 25.,2,67
+This product is amazing and works perfectly! Additional context 66.,2,67
+Very disappointed with this purchase. Additional context 51.,0,60
+"Decent item, meets basic requirements. Additional context 70.",1,61
+Poor customer service and delayed shipping. Additional context 7.,0,65
+Average quality for the price point. Additional context 64.,1,59
+"Fair value, does what it's supposed to do. Additional context 33.",1,65
+Poor customer service and delayed shipping. Additional context 36.,0,66
+This product is amazing and works perfectly! Additional context 97.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 27.,2,70
+"Product is okay, nothing special but works. Additional context 68.",1,66
+"Worst purchase ever, complete waste of money. Additional context 10.",0,68
+"Love this item, exactly what I was looking for. Additional context 74.",2,70
+Perfect solution to my problem. Very satisfied! Additional context 31.,2,70
+"Standard product, no complaints but not impressed. Additional context 88.",1,73
+"Fair value, does what it's supposed to do. Additional context 8.",1,64
+Perfect solution to my problem. Very satisfied! Additional context 47.,2,70
+Excellent quality and fast delivery. Highly recommended! Additional context 27.,2,79
+"Decent item, meets basic requirements. Additional context 36.",1,61
+Poor customer service and delayed shipping. Additional context 27.,0,66
+Outstanding customer service and great value. Additional context 11.,2,68
+"Worst purchase ever, complete waste of money. Additional context 38.",0,68
+"Worst purchase ever, complete waste of money. Additional context 46.",0,68
+"Standard product, no complaints but not impressed. Additional context 90.",1,73
+Excellent quality and fast delivery. Highly recommended! Additional context 89.,2,79
+Outstanding customer service and great value. Additional context 43.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 72.,2,70
+Average quality for the price point. Additional context 92.,1,59
+Average quality for the price point. Additional context 9.,1,58
+Poor customer service and delayed shipping. Additional context 29.,0,66
+"Terrible quality, broke after one day. Additional context 86.",0,61
+"Product is okay, nothing special but works. Additional context 46.",1,66
+Perfect solution to my problem. Very satisfied! Additional context 90.,2,70
+Product doesn't match description at all. Additional context 54.,0,64
+"Product is okay, nothing special but works. Additional context 1.",1,65
+"Decent item, meets basic requirements. Additional context 40.",1,61
+"Fair value, does what it's supposed to do. Additional context 47.",1,65
+Perfect solution to my problem. Very satisfied! Additional context 9.,2,69
+Product doesn't match description at all. Additional context 57.,0,64
+Excellent quality and fast delivery. Highly recommended! Additional context 41.,2,79
+"Standard product, no complaints but not impressed. Additional context 25.",1,73
+Poor customer service and delayed shipping. Additional context 38.,0,66
+"Worst purchase ever, complete waste of money. Additional context 91.",0,68
+Poor customer service and delayed shipping. Additional context 17.,0,66
+"Decent item, meets basic requirements. Additional context 51.",1,61
+"Terrible quality, broke after one day. Additional context 71.",0,61
+Very disappointed with this purchase. Additional context 88.,0,60
+This product is amazing and works perfectly! Additional context 29.,2,67
+"Decent item, meets basic requirements. Additional context 22.",1,61
+Product doesn't match description at all. Additional context 85.,0,64
+This product is amazing and works perfectly! Additional context 84.,2,67
+This product is amazing and works perfectly! Additional context 20.,2,67
+Product doesn't match description at all. Additional context 63.,0,64
+This product is amazing and works perfectly! Additional context 71.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 94.,2,70
+"Decent item, meets basic requirements. Additional context 56.",1,61
+"Fair value, does what it's supposed to do. Additional context 49.",1,65
+Perfect solution to my problem. Very satisfied! Additional context 30.,2,70
+Average quality for the price point. Additional context 1.,1,58
+Poor customer service and delayed shipping. Additional context 47.,0,66
+"Worst purchase ever, complete waste of money. Additional context 92.",0,68
+Excellent quality and fast delivery. Highly recommended! Additional context 94.,2,79
+Poor customer service and delayed shipping. Additional context 63.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 55.,2,70
+"Decent item, meets basic requirements. Additional context 32.",1,61
+"Worst purchase ever, complete waste of money. Additional context 83.",0,68
+"Worst purchase ever, complete waste of money. Additional context 97.",0,68
+"Standard product, no complaints but not impressed. Additional context 32.",1,73
+Very disappointed with this purchase. Additional context 8.,0,59
+This product is amazing and works perfectly! Additional context 67.,2,67
+"Decent item, meets basic requirements. Additional context 72.",1,61
+"Terrible quality, broke after one day. Additional context 67.",0,61
+"Product is okay, nothing special but works. Additional context 92.",1,66
+Average quality for the price point. Additional context 35.,1,59
+Poor customer service and delayed shipping. Additional context 16.,0,66
+Perfect solution to my problem. Very satisfied! Additional context 14.,2,70
+Average quality for the price point. Additional context 7.,1,58
+"Terrible quality, broke after one day. Additional context 23.",0,61
+"Love this item, exactly what I was looking for. Additional context 19.",2,70
+Outstanding customer service and great value. Additional context 82.,2,68
+"Terrible quality, broke after one day. Additional context 47.",0,61
+Outstanding customer service and great value. Additional context 11.,2,68
+"Worst purchase ever, complete waste of money. Additional context 67.",0,68
+"Standard product, no complaints but not impressed. Additional context 20.",1,73
+Perfect solution to my problem. Very satisfied! Additional context 38.,2,70
+"Terrible quality, broke after one day. Additional context 98.",0,61
+Outstanding customer service and great value. Additional context 99.,2,68
+Product doesn't match description at all. Additional context 24.,0,64
+Excellent quality and fast delivery. Highly recommended! Additional context 30.,2,79
+"Product is okay, nothing special but works. Additional context 81.",1,66
+"Terrible quality, broke after one day. Additional context 40.",0,61
+Very disappointed with this purchase. Additional context 25.,0,60
+"Product is okay, nothing special but works. Additional context 22.",1,66
+"Standard product, no complaints but not impressed. Additional context 26.",1,73
+Very disappointed with this purchase. Additional context 98.,0,60
+"Fair value, does what it's supposed to do. Additional context 75.",1,65
+"Worst purchase ever, complete waste of money. Additional context 85.",0,68
+Product doesn't match description at all. Additional context 41.,0,64
+"Worst purchase ever, complete waste of money. Additional context 17.",0,68
+This product is amazing and works perfectly! Additional context 76.,2,67
+"Fair value, does what it's supposed to do. Additional context 86.",1,65
+"Love this item, exactly what I was looking for. Additional context 57.",2,70
+"Decent item, meets basic requirements. Additional context 40.",1,61
+Product doesn't match description at all. Additional context 53.,0,64
+Average quality for the price point. Additional context 45.,1,59
+Excellent quality and fast delivery. Highly recommended! Additional context 85.,2,79
+"Worst purchase ever, complete waste of money. Additional context 46.",0,68
+Product doesn't match description at all. Additional context 54.,0,64
+"Product is okay, nothing special but works. Additional context 51.",1,66
+Outstanding customer service and great value. Additional context 26.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 11.,2,70
+"Standard product, no complaints but not impressed. Additional context 59.",1,73
+"Decent item, meets basic requirements. Additional context 54.",1,61
+Very disappointed with this purchase. Additional context 56.,0,60
+Excellent quality and fast delivery. Highly recommended! Additional context 36.,2,79
+"Standard product, no complaints but not impressed. Additional context 83.",1,73
+"Standard product, no complaints but not impressed. Additional context 81.",1,73
+Poor customer service and delayed shipping. Additional context 98.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 66.,2,79
+This product is amazing and works perfectly! Additional context 73.,2,67
+This product is amazing and works perfectly! Additional context 89.,2,67
+"Love this item, exactly what I was looking for. Additional context 42.",2,70
+"Love this item, exactly what I was looking for. Additional context 3.",2,69
+Very disappointed with this purchase. Additional context 44.,0,60
+Average quality for the price point. Additional context 12.,1,59
+"Fair value, does what it's supposed to do. Additional context 44.",1,65
+"Decent item, meets basic requirements. Additional context 49.",1,61
+This product is amazing and works perfectly! Additional context 74.,2,67
+This product is amazing and works perfectly! Additional context 47.,2,67
+Poor customer service and delayed shipping. Additional context 8.,0,65
+"Fair value, does what it's supposed to do. Additional context 81.",1,65
+"Fair value, does what it's supposed to do. Additional context 80.",1,65
+"Terrible quality, broke after one day. Additional context 82.",0,61
+Outstanding customer service and great value. Additional context 15.,2,68
+Average quality for the price point. Additional context 26.,1,59
+Average quality for the price point. Additional context 16.,1,59
+"Product is okay, nothing special but works. Additional context 23.",1,66
+Very disappointed with this purchase. Additional context 86.,0,60
+Very disappointed with this purchase. Additional context 7.,0,59
+"Love this item, exactly what I was looking for. Additional context 48.",2,70
+Poor customer service and delayed shipping. Additional context 87.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 95.,2,79
+Product doesn't match description at all. Additional context 39.,0,64
+Average quality for the price point. Additional context 59.,1,59
+"Terrible quality, broke after one day. Additional context 14.",0,61
+"Decent item, meets basic requirements. Additional context 60.",1,61
+Excellent quality and fast delivery. Highly recommended! Additional context 3.,2,78
+"Love this item, exactly what I was looking for. Additional context 40.",2,70
+Product doesn't match description at all. Additional context 39.,0,64
+"Product is okay, nothing special but works. Additional context 4.",1,65
+This product is amazing and works perfectly! Additional context 13.,2,67
+"Terrible quality, broke after one day. Additional context 16.",0,61
+Excellent quality and fast delivery. Highly recommended! Additional context 66.,2,79
+"Decent item, meets basic requirements. Additional context 42.",1,61
+Poor customer service and delayed shipping. Additional context 13.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 32.,2,79
+"Decent item, meets basic requirements. Additional context 39.",1,61
+Product doesn't match description at all. Additional context 29.,0,64
+"Terrible quality, broke after one day. Additional context 93.",0,61
+Very disappointed with this purchase. Additional context 57.,0,60
+"Product is okay, nothing special but works. Additional context 10.",1,66
+"Terrible quality, broke after one day. Additional context 84.",0,61
+This product is amazing and works perfectly! Additional context 94.,2,67
+"Love this item, exactly what I was looking for. Additional context 45.",2,70
+"Worst purchase ever, complete waste of money. Additional context 68.",0,68
+Very disappointed with this purchase. Additional context 25.,0,60
+Perfect solution to my problem. Very satisfied! Additional context 79.,2,70
+This product is amazing and works perfectly! Additional context 88.,2,67
+Average quality for the price point. Additional context 37.,1,59
+Perfect solution to my problem. Very satisfied! Additional context 43.,2,70
+Poor customer service and delayed shipping. Additional context 62.,0,66
+Excellent quality and fast delivery. Highly recommended! Additional context 25.,2,79
+"Standard product, no complaints but not impressed. Additional context 4.",1,72
+"Standard product, no complaints but not impressed. Additional context 93.",1,73
+"Fair value, does what it's supposed to do. Additional context 74.",1,65
+Average quality for the price point. Additional context 57.,1,59
+"Terrible quality, broke after one day. Additional context 3.",0,60
+Very disappointed with this purchase. Additional context 5.,0,59
+"Terrible quality, broke after one day. Additional context 9.",0,60
+"Standard product, no complaints but not impressed. Additional context 61.",1,73
+Average quality for the price point. Additional context 35.,1,59
+"Worst purchase ever, complete waste of money. Additional context 62.",0,68
+"Love this item, exactly what I was looking for. Additional context 32.",2,70
+"Fair value, does what it's supposed to do. Additional context 89.",1,65
+Outstanding customer service and great value. Additional context 14.,2,68
+Excellent quality and fast delivery. Highly recommended! Additional context 11.,2,79
+"Love this item, exactly what I was looking for. Additional context 92.",2,70
+This product is amazing and works perfectly! Additional context 67.,2,67
+Excellent quality and fast delivery. Highly recommended! Additional context 76.,2,79
+"Terrible quality, broke after one day. Additional context 79.",0,61
+Perfect solution to my problem. Very satisfied! Additional context 11.,2,70
+Average quality for the price point. Additional context 88.,1,59
+"Decent item, meets basic requirements. Additional context 5.",1,60
+"Worst purchase ever, complete waste of money. Additional context 70.",0,68
+Outstanding customer service and great value. Additional context 48.,2,68
+Outstanding customer service and great value. Additional context 69.,2,68
+This product is amazing and works perfectly! Additional context 40.,2,67
+Perfect solution to my problem. Very satisfied! Additional context 58.,2,70
+Average quality for the price point. Additional context 40.,1,59
+"Fair value, does what it's supposed to do. Additional context 33.",1,65
+Poor customer service and delayed shipping. Additional context 80.,0,66
+"Love this item, exactly what I was looking for. Additional context 59.",2,70
+Perfect solution to my problem. Very satisfied! Additional context 45.,2,70
+Perfect solution to my problem. Very satisfied! Additional context 42.,2,70
+"Decent item, meets basic requirements. Additional context 38.",1,61
+"Fair value, does what it's supposed to do. Additional context 45.",1,65
+"Terrible quality, broke after one day. Additional context 31.",0,61
+Average quality for the price point. Additional context 10.,1,59
+"Fair value, does what it's supposed to do. Additional context 30.",1,65
+Average quality for the price point. Additional context 2.,1,58
+Very disappointed with this purchase. Additional context 93.,0,60
+Average quality for the price point. Additional context 96.,1,59
+"Love this item, exactly what I was looking for. Additional context 17.",2,70
+Average quality for the price point. Additional context 60.,1,59
+"Love this item, exactly what I was looking for. Additional context 70.",2,70
+Average quality for the price point. Additional context 96.,1,59
+Product doesn't match description at all. Additional context 60.,0,64
+"Fair value, does what it's supposed to do. Additional context 93.",1,65
+Product doesn't match description at all. Additional context 20.,0,64
+Product doesn't match description at all. Additional context 91.,0,64
+Outstanding customer service and great value. Additional context 22.,2,68
+Excellent quality and fast delivery. Highly recommended! Additional context 65.,2,79
+"Worst purchase ever, complete waste of money. Additional context 82.",0,68
+Very disappointed with this purchase. Additional context 76.,0,60
+"Decent item, meets basic requirements. Additional context 52.",1,61
+Outstanding customer service and great value. Additional context 7.,2,67
+"Love this item, exactly what I was looking for. Additional context 33.",2,70
+Poor customer service and delayed shipping. Additional context 75.,0,66
+"Worst purchase ever, complete waste of money. Additional context 98.",0,68
+"Worst purchase ever, complete waste of money. Additional context 29.",0,68
+"Love this item, exactly what I was looking for. Additional context 13.",2,70
+Perfect solution to my problem. Very satisfied! Additional context 29.,2,70
+"Standard product, no complaints but not impressed. Additional context 32.",1,73
+Product doesn't match description at all. Additional context 22.,0,64
+"Decent item, meets basic requirements. Additional context 67.",1,61
+Outstanding customer service and great value. Additional context 56.,2,68
+Perfect solution to my problem. Very satisfied! Additional context 47.,2,70
+"Love this item, exactly what I was looking for. Additional context 84.",2,70
+Poor customer service and delayed shipping. Additional context 57.,0,66
+"Love this item, exactly what I was looking for. Additional context 1.",2,69
+Product doesn't match description at all. Additional context 38.,0,64
+Average quality for the price point. Additional context 61.,1,59
+"Product is okay, nothing special but works. Additional context 25.",1,66
+Product doesn't match description at all. Additional context 80.,0,64
+"Standard product, no complaints but not impressed. Additional context 46.",1,73
+This product is amazing and works perfectly! Additional context 93.,2,67
+"Love this item, exactly what I was looking for. Additional context 46.",2,70
+Product doesn't match description at all. Additional context 71.,0,64
+"Fair value, does what it's supposed to do. Additional context 64.",1,65
+Outstanding customer service and great value. Additional context 3.,2,67
+"Terrible quality, broke after one day. Additional context 94.",0,61
+"Terrible quality, broke after one day. Additional context 84.",0,61
+This product is amazing and works perfectly! Additional context 60.,2,67
+"Fair value, does what it's supposed to do. Additional context 2.",1,64
+"Fair value, does what it's supposed to do. Additional context 81.",1,65

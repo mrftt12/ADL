@@ -1,0 +1,155 @@
+# Google Cloud Build configuration for AutoML Framework - Build Images Only
+# This configuration only builds and pushes Docker images without deployment
+
+steps:
+  # Step 1: Build API image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BRANCH_NAME'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+      - '--build-arg'
+      - 'BUILD_ID=$BUILD_ID'
+      - '--build-arg'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+    waitFor: ['-']
+
+  # Step 2: Build worker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-worker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:$BRANCH_NAME'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:latest'
+      - '-f'
+      - 'Dockerfile.worker'
+      - '.'
+      - '--build-arg'
+      - 'BUILD_ID=$BUILD_ID'
+      - '--build-arg'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+    waitFor: ['-']
+
+  # Step 3: Build frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BRANCH_NAME'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '.'
+      - '--build-arg'
+      - 'BUILD_ID=$BUILD_ID'
+      - '--build-arg'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+    waitFor: ['-']
+
+  # Step 4: Run security scan on API image
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'scan-api'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud container images scan gcr.io/$PROJECT_ID/automl-api:$BUILD_ID \
+          --format='value(response.vulnerabilities.vulnerability.effectiveSeverity)' || true
+    waitFor: ['build-api']
+
+  # Step 5: Push all images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/automl-api'
+    waitFor: ['build-api', 'scan-api']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/automl-worker'
+    waitFor: ['build-worker']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/automl-frontend'
+    waitFor: ['build-frontend']
+
+  # Step 6: Create image manifest
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-manifest'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cat > image-manifest.json << EOF
+        {
+          "build_id": "$BUILD_ID",
+          "commit_sha": "$COMMIT_SHA",
+          "branch": "$BRANCH_NAME",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "images": {
+            "api": "gcr.io/$PROJECT_ID/automl-api:$BUILD_ID",
+            "worker": "gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID",
+            "frontend": "gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID"
+          }
+        }
+        EOF
+        
+        # Upload manifest to Cloud Storage
+        gsutil cp image-manifest.json gs://${_ARTIFACTS_BUCKET}/manifests/build-$BUILD_ID.json
+        
+        echo "Image manifest created and uploaded to gs://${_ARTIFACTS_BUCKET}/manifests/build-$BUILD_ID.json"
+    waitFor: ['push-api', 'push-worker', 'push-frontend']
+
+# Substitution variables
+substitutions:
+  _ARTIFACTS_BUCKET: '${PROJECT_ID}-automl-artifacts'
+
+# Build timeout
+timeout: '1800s'
+
+# Build options
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: 100
+  logging: CLOUD_LOGGING_ONLY
+
+# All images to be pushed
+images:
+  - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-api:$BRANCH_NAME'
+  - 'gcr.io/$PROJECT_ID/automl-api:latest'
+  - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-worker:$BRANCH_NAME'
+  - 'gcr.io/$PROJECT_ID/automl-worker:latest'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:$BRANCH_NAME'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+
+tags:
+  - 'automl-framework'
+  - 'build-only'

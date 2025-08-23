@@ -1,0 +1,113 @@
+# Simple Google Cloud Build configuration for AutoML Framework
+# This configuration builds and pushes Docker images only
+
+steps:
+  # Step 1: Build the main API image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    waitFor: ['-']
+
+  # Step 2: Build the worker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-worker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:latest'
+      - '-f'
+      - 'Dockerfile.worker'
+      - '.'
+    waitFor: ['-']
+
+  # Step 3: Build the frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '.'
+    waitFor: ['-']
+
+  # Step 4: Push API image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+    waitFor: ['build-api']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-api:latest'
+    waitFor: ['build-api']
+
+  # Step 5: Push worker image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+    waitFor: ['build-worker']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-worker:latest'
+    waitFor: ['build-worker']
+
+  # Step 6: Push frontend image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+    waitFor: ['build-frontend']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+    waitFor: ['build-frontend']
+
+# Build timeout
+timeout: '1800s'
+
+# Build options
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: 100
+  logging: CLOUD_LOGGING_ONLY
+
+# Images to be pushed to Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-api:latest'
+  - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-worker:latest'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+
+# Tags for organizing builds
+tags:
+  - 'automl-framework'
+  - 'build-only'

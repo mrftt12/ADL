@@ -10,7 +10,7 @@ from typing import Optional, Dict, Any
 from contextlib import contextmanager
 import logging
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from sqlalchemy.pool import QueuePool
 from pymongo import MongoClient
@@ -26,14 +26,18 @@ class DatabaseConfig:
     """Configuration class for database connections."""
     
     def __init__(self):
-        # PostgreSQL configuration
+        # Check if we have direct database URLs (Docker Compose style)
+        self.database_url = os.getenv("DATABASE_URL")
+        self.mongodb_url = os.getenv("MONGODB_URL")
+        
+        # PostgreSQL configuration (fallback to individual env vars)
         self.postgres_host = os.getenv("POSTGRES_HOST", "localhost")
         self.postgres_port = int(os.getenv("POSTGRES_PORT", "5432"))
         self.postgres_db = os.getenv("POSTGRES_DB", "automl")
         self.postgres_user = os.getenv("POSTGRES_USER", "automl_user")
         self.postgres_password = os.getenv("POSTGRES_PASSWORD", "automl_pass")
         
-        # MongoDB configuration
+        # MongoDB configuration (fallback to individual env vars)
         self.mongo_host = os.getenv("MONGO_HOST", "localhost")
         self.mongo_port = int(os.getenv("MONGO_PORT", "27017"))
         self.mongo_db = os.getenv("MONGO_DB", "automl")
@@ -48,6 +52,11 @@ class DatabaseConfig:
     @property
     def postgres_url(self) -> str:
         """Get PostgreSQL connection URL."""
+        # Use DATABASE_URL if available (Docker Compose style)
+        if self.database_url:
+            return self.database_url
+        
+        # Fallback to individual environment variables
         return (
             f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
@@ -56,6 +65,11 @@ class DatabaseConfig:
     @property
     def mongo_url(self) -> str:
         """Get MongoDB connection URL."""
+        # Use MONGODB_URL if available (Docker Compose style)
+        if self.mongodb_url:
+            return self.mongodb_url
+        
+        # Fallback to individual environment variables
         if self.mongo_user and self.mongo_password:
             return (
                 f"mongodb://{self.mongo_user}:{self.mongo_password}"
@@ -232,7 +246,7 @@ class DatabaseManager:
         # Check PostgreSQL
         try:
             with self.postgres.get_session() as session:
-                session.execute("SELECT 1")
+                session.execute(text("SELECT 1"))
             health["postgresql"] = True
         except Exception as e:
             logger.error(f"PostgreSQL health check failed: {e}")

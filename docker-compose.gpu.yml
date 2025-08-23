@@ -1,0 +1,25 @@
+version: '3.8'
+
+# GPU-enabled override for docker-compose.yml
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up
+
+services:
+  # Training Worker Service with GPU support
+  training-worker:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # NAS Worker Service with GPU support
+  nas-worker:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

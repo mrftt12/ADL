@@ -1,0 +1,61 @@
+# Google Cloud Build configuration for AutoML Framework - Cloud Run Only
+# This configuration builds Docker images and deploys only to Cloud Run
+
+steps:
+  # Step 1: Build the main API image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    waitFor: ['-']
+
+  # Step 2: Build the frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '.'
+    waitFor: ['-']
+
+  # Step 3: Push API image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+    waitFor: ['build-api']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-api:latest'
+    waitFor: ['build-api']
+
+  # Step 4: Push frontend image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+    waitFor: ['build-frontend']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:latest'
+    waitFor: ['build-frontend']

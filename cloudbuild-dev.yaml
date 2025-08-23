@@ -1,0 +1,127 @@
+# Google Cloud Build configuration for AutoML Framework - Development Environment
+# This configuration is optimized for development builds and testing
+
+steps:
+  # Step 1: Run tests before building
+  - name: 'python:3.12-slim'
+    id: 'run-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y gcc g++ libpq-dev curl
+        pip install -r requirements.txt
+        python -m pytest tests/ -v --tb=short
+    waitFor: ['-']
+
+  # Step 2: Build API image for development
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api-dev'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:dev-$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:dev-latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+      - '--build-arg'
+      - 'ENVIRONMENT=development'
+    waitFor: ['run-tests']
+
+  # Step 3: Build frontend image for development
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend-dev'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:dev-$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:dev-latest'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '.'
+    waitFor: ['-']
+
+  # Step 4: Push development images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api-dev'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-api:dev-$SHORT_SHA'
+    waitFor: ['build-api-dev']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend-dev'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:dev-$SHORT_SHA'
+    waitFor: ['build-frontend-dev']
+
+  # Step 5: Deploy to development Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-api-dev'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'automl-api-dev'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/automl-api:dev-$SHORT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8000'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '3'
+      - '--set-env-vars'
+      - 'ENVIRONMENT=development,LOG_LEVEL=DEBUG'
+    waitFor: ['push-api-dev']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-frontend-dev'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'automl-frontend-dev'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:dev-$SHORT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '2'
+    waitFor: ['push-frontend-dev']
+
+# Build timeout
+timeout: '1200s'
+
+# Build options for development
+options:
+  machineType: 'E2_STANDARD_4'
+  diskSizeGb: 50
+  logging: CLOUD_LOGGING_ONLY
+
+# Development images
+images:
+  - 'gcr.io/$PROJECT_ID/automl-api:dev-$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:dev-$SHORT_SHA'
+
+tags:
+  - 'automl-framework'
+  - 'development'

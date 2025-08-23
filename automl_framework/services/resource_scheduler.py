@@ -235,6 +235,9 @@ class ResourceScheduler(IResourceScheduler):
             ResourceError: If resource allocation fails
         """
         try:
+            # Validate and adjust requirements for current environment
+            job_requirements = self._validate_requirements_for_environment(job_requirements)
+            
             # Parse job requirements
             requirements = self._parse_job_requirements(job_requirements)
             requirements.validate()
@@ -586,6 +589,73 @@ class ResourceScheduler(IResourceScheduler):
                 logger.error(f"Error in periodic resource updates: {e}")
                 await asyncio.sleep(5)  # Wait before retrying
     
+    def _validate_requirements_for_environment(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate and adjust resource requirements for current environment.
+        
+        Args:
+            requirements: Original resource requirements
+            
+        Returns:
+            Dict[str, Any]: Validated and adjusted requirements
+        """
+        try:
+            from automl_framework.core.environment import get_environment_manager
+            env_manager = get_environment_manager()
+            
+            if not env_manager.is_gpu_enabled():
+                # Force CPU-only requirements
+                if requirements.get('gpu_count', 0) > 0:
+                    logger.warning(f"GPU requested ({requirements.get('gpu_count')}) but not available, forcing CPU-only mode")
+                    
+                    # Remove GPU requirements
+                    requirements['gpu_count'] = 0
+                    requirements['gpu_memory_gb'] = 0.0
+                    
+                    # Increase CPU resources to compensate
+                    original_cpu = requirements.get('cpu_cores', 1)
+                    requirements['cpu_cores'] = min(original_cpu * 2, 8)
+                    
+                    # Increase memory allocation
+                    original_memory = requirements.get('memory_gb', 1.0)
+                    requirements['memory_gb'] = min(original_memory * 1.5, 8.0)
+                    
+                    # Increase estimated duration for CPU processing
+                    original_duration = requirements.get('estimated_duration_minutes', 60)
+                    requirements['estimated_duration_minutes'] = int(original_duration * 2)
+                    
+                    logger.info(f"Adjusted requirements for CPU-only mode: {requirements['cpu_cores']} CPU cores, {requirements['memory_gb']}GB memory")
+            
+            # Apply environment-specific resource limits
+            resource_limits = env_manager.get_resource_limits()
+            
+            # Limit CPU cores based on environment
+            max_cpu = resource_limits.get('max_cpu_cores', 8)
+            if requirements.get('cpu_cores', 1) > max_cpu:
+                logger.warning(f"Requested CPU cores ({requirements.get('cpu_cores')}) exceeds environment limit ({max_cpu})")
+                requirements['cpu_cores'] = max_cpu
+            
+            # Limit memory based on environment
+            max_memory = resource_limits.get('max_memory_mb', 8192) / 1024  # Convert to GB
+            if requirements.get('memory_gb', 1.0) > max_memory:
+                logger.warning(f"Requested memory ({requirements.get('memory_gb')}GB) exceeds environment limit ({max_memory}GB)")
+                requirements['memory_gb'] = max_memory
+            
+            # Limit GPU based on environment
+            max_gpu = resource_limits.get('max_gpu_per_experiment', 0)
+            if requirements.get('gpu_count', 0) > max_gpu:
+                logger.warning(f"Requested GPU count ({requirements.get('gpu_count')}) exceeds environment limit ({max_gpu})")
+                requirements['gpu_count'] = max_gpu
+                if max_gpu == 0:
+                    requirements['gpu_memory_gb'] = 0.0
+            
+        except ImportError:
+            logger.debug("Environment manager not available for requirement validation")
+        except Exception as e:
+            logger.error(f"Error validating requirements for environment: {e}")
+        
+        return requirements
+    
     def _parse_job_requirements(self, requirements: Dict[str, Any]) -> ResourceRequirement:
         """Parse job requirements from dictionary."""
         return ResourceRequirement(
@@ -620,10 +690,22 @@ class ResourceScheduler(IResourceScheduler):
             logger.debug(f"Cannot allocate job {job.job_id}: insufficient memory ({req.memory_gb} > {sys_res.available_memory_gb})")
             return False
         
-        # Check GPU
-        if req.gpu_count > sys_res.available_gpu_count:
-            logger.debug(f"Cannot allocate job {job.job_id}: insufficient GPUs ({req.gpu_count} > {sys_res.available_gpu_count})")
-            return False
+        # Check GPU availability and environment support
+        if req.gpu_count > 0:
+            # Check if environment supports GPU
+            try:
+                from automl_framework.core.environment import get_environment_manager
+                env_manager = get_environment_manager()
+                if not env_manager.is_gpu_enabled():
+                    logger.debug(f"Cannot allocate job {job.job_id}: GPU requested but not available in environment")
+                    return False
+            except ImportError:
+                logger.debug("Environment manager not available for GPU validation")
+            
+            # Check available GPU count
+            if req.gpu_count > sys_res.available_gpu_count:
+                logger.debug(f"Cannot allocate job {job.job_id}: insufficient GPUs ({req.gpu_count} > {sys_res.available_gpu_count})")
+                return False
         
         # Check fair sharing constraints
         if self.enable_fair_sharing and not self._check_fair_sharing(job):
@@ -849,8 +931,17 @@ class ResourceScheduler(IResourceScheduler):
             logger.error(f"Failed to update system resources: {e}")
     
     def _get_gpu_info(self) -> List[Dict[str, Any]]:
-        """Get GPU information using nvidia-smi."""
+        """Get GPU information using environment detection and nvidia-smi."""
         try:
+            # First check if GPU is available through environment detection
+            from automl_framework.core.environment import get_environment_manager
+            env_manager = get_environment_manager()
+            
+            if not env_manager.is_gpu_enabled():
+                logger.debug("GPU not available according to environment detection")
+                return []
+            
+            # Try to get detailed GPU info using nvidia-smi
             result = subprocess.run(
                 ['nvidia-smi', '--query-gpu=index,name,memory.total,memory.used,utilization.gpu', 
                  '--format=csv,noheader,nounits'],
@@ -873,7 +964,39 @@ class ResourceScheduler(IResourceScheduler):
                             })
                 return gpu_info
             else:
-                # No GPUs or nvidia-smi not available
+                # nvidia-smi failed but environment says GPU should be available
+                logger.warning("Environment indicates GPU available but nvidia-smi failed")
+                return []
+                
+        except ImportError:
+            logger.debug("Environment manager not available, falling back to nvidia-smi only")
+            # Fallback to original behavior
+            try:
+                result = subprocess.run(
+                    ['nvidia-smi', '--query-gpu=index,name,memory.total,memory.used,utilization.gpu', 
+                     '--format=csv,noheader,nounits'],
+                    capture_output=True, text=True, timeout=10
+                )
+                
+                if result.returncode == 0:
+                    gpu_info = []
+                    for line in result.stdout.strip().split('\n'):
+                        if line:
+                            parts = line.split(', ')
+                            if len(parts) >= 5:
+                                gpu_info.append({
+                                    'index': int(parts[0]),
+                                    'name': parts[1],
+                                    'memory_total_mb': int(parts[2]),
+                                    'memory_used_mb': int(parts[3]),
+                                    'utilization_percent': int(parts[4]),
+                                    'available': int(parts[4]) < 80
+                                })
+                    return gpu_info
+                else:
+                    return []
+            except (subprocess.TimeoutExpired, FileNotFoundError, Exception) as e:
+                logger.debug(f"Could not get GPU info: {e}")
                 return []
                 
         except (subprocess.TimeoutExpired, FileNotFoundError, Exception) as e:

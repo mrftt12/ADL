@@ -1,0 +1,256 @@
+# Google Cloud Build configuration for AutoML Framework - GKE Deployment
+# This configuration builds images and deploys to Google Kubernetes Engine
+
+steps:
+  # Step 1: Build all images in parallel
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    waitFor: ['-']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-worker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+      - '-f'
+      - 'Dockerfile.worker'
+      - '.'
+    waitFor: ['-']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '.'
+    waitFor: ['-']
+
+  # Step 2: Push all images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api'
+    args: ['push', 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID']
+    waitFor: ['build-api']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker'
+    args: ['push', 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID']
+    waitFor: ['build-worker']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args: ['push', 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID']
+    waitFor: ['build-frontend']
+
+  # Step 3: Generate Kubernetes manifests from docker-compose
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'generate-k8s-manifests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Install kompose
+        curl -L https://github.com/kubernetes/kompose/releases/download/v1.28.0/kompose-linux-amd64 -o kompose
+        chmod +x kompose
+        
+        # Convert docker-compose to Kubernetes manifests
+        ./kompose convert -f docker-compose.yml --out k8s-generated/
+        
+        # Update image references to use GCR
+        sed -i "s|image: automl-api|image: gcr.io/$PROJECT_ID/automl-api:$BUILD_ID|g" k8s-generated/*.yaml
+        sed -i "s|image: automl-worker|image: gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID|g" k8s-generated/*.yaml
+        sed -i "s|image: automl-frontend|image: gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID|g" k8s-generated/*.yaml
+        
+        # Show generated manifests
+        ls -la k8s-generated/
+    waitFor: ['-']
+
+  # Step 4: Deploy to GKE cluster
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'deploy-namespace'
+    args:
+      - 'create'
+      - 'namespace'
+      - '${_NAMESPACE}'
+      - '--dry-run=client'
+      - '-o'
+      - 'yaml'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['generate-k8s-manifests']
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'apply-namespace'
+    args:
+      - 'apply'
+      - '-f'
+      - '-'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['deploy-namespace']
+
+  # Step 5: Create ConfigMaps and Secrets
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'create-secrets'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Create database secrets
+        kubectl create secret generic automl-db-secrets \
+          --from-literal=postgres-password=automl_password \
+          --from-literal=mongodb-password=automl_password \
+          --from-literal=redis-password=automl_password \
+          --namespace=${_NAMESPACE} \
+          --dry-run=client -o yaml | kubectl apply -f -
+        
+        # Create application config
+        kubectl create configmap automl-config \
+          --from-literal=environment=production \
+          --from-literal=log-level=INFO \
+          --namespace=${_NAMESPACE} \
+          --dry-run=client -o yaml | kubectl apply -f -
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['apply-namespace']
+
+  # Step 6: Deploy database services
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'deploy-databases'
+    args:
+      - 'apply'
+      - '-f'
+      - 'k8s/'
+      - '--namespace=${_NAMESPACE}'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['create-secrets', 'push-api', 'push-worker', 'push-frontend']
+
+  # Step 7: Wait for databases to be ready
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'wait-for-databases'
+    args:
+      - 'wait'
+      - '--for=condition=ready'
+      - 'pod'
+      - '-l'
+      - 'app=postgres'
+      - '--timeout=300s'
+      - '--namespace=${_NAMESPACE}'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['deploy-databases']
+
+  # Step 8: Deploy application services
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'deploy-api'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Update API deployment with new image
+        kubectl set image deployment/automl-api \
+          automl-api=gcr.io/$PROJECT_ID/automl-api:$BUILD_ID \
+          --namespace=${_NAMESPACE}
+        
+        # Wait for rollout
+        kubectl rollout status deployment/automl-api --namespace=${_NAMESPACE}
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['wait-for-databases']
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'deploy-workers'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Update worker deployment with new image
+        kubectl set image deployment/automl-workers \
+          automl-worker=gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID \
+          --namespace=${_NAMESPACE}
+        
+        # Wait for rollout
+        kubectl rollout status deployment/automl-workers --namespace=${_NAMESPACE}
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['deploy-api']
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'deploy-frontend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Update frontend deployment with new image
+        kubectl set image deployment/automl-frontend \
+          automl-frontend=gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID \
+          --namespace=${_NAMESPACE}
+        
+        # Wait for rollout
+        kubectl rollout status deployment/automl-frontend --namespace=${_NAMESPACE}
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['deploy-workers']
+
+  # Step 9: Get service endpoints
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'get-endpoints'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "=== Deployment Summary ==="
+        kubectl get services --namespace=${_NAMESPACE}
+        echo ""
+        kubectl get ingress --namespace=${_NAMESPACE}
+        echo ""
+        echo "=== Pod Status ==="
+        kubectl get pods --namespace=${_NAMESPACE}
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+    waitFor: ['deploy-frontend']
+
+# Substitution variables for GKE deployment
+substitutions:
+  _ZONE: 'us-central1-a'
+  _CLUSTER: 'automl-cluster'
+  _NAMESPACE: 'automl-production'
+
+# Build timeout
+timeout: '2400s'
+
+# Build options
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: 100
+  logging: CLOUD_LOGGING_ONLY
+
+# Images to be pushed
+images:
+  - 'gcr.io/$PROJECT_ID/automl-api:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-worker:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/automl-frontend:$BUILD_ID'
+
+tags:
+  - 'automl-framework'
+  - 'gke-deployment'

@@ -1,0 +1,61 @@
+# Cloud Build Triggers Configuration
+# This file defines the build triggers for different branches and events
+
+# Production trigger (main branch)
+production:
+  name: automl-production
+  description: "Production deployment for AutoML Framework"
+  github:
+    owner: your-github-username
+    name: automl-framework
+    push:
+      branch: ^main$
+  filename: cloudbuild.yaml
+  substitutions:
+    _REGION: us-central1
+    _ENVIRONMENT: production
+    _LOG_LEVEL: INFO
+
+# Development trigger (develop branch)
+development:
+  name: automl-development
+  description: "Development deployment for AutoML Framework"
+  github:
+    owner: your-github-username
+    name: automl-framework
+    push:
+      branch: ^develop$
+  filename: cloudbuild-dev.yaml
+  substitutions:
+    _REGION: us-central1
+    _ENVIRONMENT: development
+    _LOG_LEVEL: DEBUG
+
+# Pull request trigger (build only)
+pull-request:
+  name: automl-pr-check
+  description: "Build and test for pull requests"
+  github:
+    owner: your-github-username
+    name: automl-framework
+    pullRequest:
+      branch: ^main$
+      commentControl: COMMENTS_ENABLED
+  filename: cloudbuild-build-only.yaml
+  substitutions:
+    _SKIP_DEPLOY: "true"
+
+# Manual GKE deployment trigger
+gke-deploy:
+  name: automl-gke-deploy
+  description: "Manual GKE deployment trigger"
+  github:
+    owner: your-github-username
+    name: automl-framework
+    push:
+      tag: ^v.*
+  filename: cloudbuild-gke.yaml
+  substitutions:
+    _CLUSTER: automl-cluster
+    _ZONE: us-central1-a
+    _NAMESPACE: automl-production
